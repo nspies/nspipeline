@@ -22,14 +22,26 @@ class StepChunk(object):
         """
         pass
 
-    @abc.abstractmethod
+    def _outfiles(self):
+        """
+        return a dictionary {label : filename} specifying the output
+        files produced by this step
+        """
+        raise Exception("Either _outfiles() or outpaths() must be subclassed")
+
     def outpaths(self, final):
         """
         return a dictionary of names -> output paths; final indicates if the
         paths should be for the temporary, working version (final=False) or the
         completed final version (final=True)
         """
-        return
+        directory = self.results_dir if final \
+                    else self.working_dir
+        outfiles = self._outfiles()
+        outpaths = {}
+        for key, outfile in outfiles.items():
+            outpaths[key] = os.path.join(directory, outfile)
+        return outpaths
 
     @abc.abstractmethod
     def run(self):

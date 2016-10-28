@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import argparse
-import collections
 import json
 import logging
 import sys
@@ -13,7 +12,6 @@ from nspipeline import utilities
 
 
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-
 
 
 def ready_output_dir(options):
@@ -79,7 +77,8 @@ def parse_arguments(args, options_class, stages):
     options = load_config(args.config, options_class)
     options.debug = args.debug
 
-    print(options)
+    if options.debug:
+        print(options)
 
     if args.local:
         options.cluster_settings = nsoptions.ClusterSettings()
@@ -96,7 +95,3 @@ def main(options_class, stages):
     options = parse_arguments(sys.argv, options_class, stages)
     run(options, stages)
 
-
-
-if __name__ == '__main__':
-    main()

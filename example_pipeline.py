@@ -3,7 +3,7 @@ import os
 
 from nspipeline import options
 from nspipeline import step
-from nspipeline import main as nsmain
+from nspipeline import nsmain
 
 class ConstantsStep(step.StepChunk):
     @staticmethod
@@ -15,12 +15,9 @@ class ConstantsStep(step.StepChunk):
 
     def __str__(self):
         return ".".join([self.__class__.__name__])
-        
-    def outpaths(self, final):
-        directory = self.results_dir if final \
-                    else self.working_dir
-
-        return {"constants": os.path.join(directory, "constants.txt")}
+    
+    def _outfiles(self):
+        return {"constants": "constants.txt"}        
 
     def run(self):
         outpath = self.outpaths(final=False)["constants"]
