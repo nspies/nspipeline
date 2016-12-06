@@ -79,7 +79,7 @@ class Options(object):
 
         try:
             pickle.dumps(state)
-        except:
+        except pickle.PicklingError:
             print("Error pickling options -- couldn't serialize all objects! please ")
             print("try overriding __getstate__()")
             raise
