@@ -42,7 +42,6 @@ class Options(object):
         self._output_dir = os.path.dirname(self.options_path)
 
         self.cluster_settings = ClusterSettings()
-
         self.debug = debug
 
     @staticmethod
@@ -50,7 +49,8 @@ class Options(object):
         options = Options(options_path)
 
         options.cluster_settings = ClusterSettings.deserialize(
-            options_dict.get("cluster_settings", {}))
+            options_dict.pop("cluster_settings", {}))
+        options.__dict__.update(options_dict)
 
         return options
 
@@ -79,7 +79,7 @@ class Options(object):
 
         try:
             pickle.dumps(state)
-        except pickle.PicklingError:
+        except (pickle.PicklingError, TypeError):
             print("Error pickling options -- couldn't serialize all objects! please ")
             print("try overriding __getstate__()")
             raise
