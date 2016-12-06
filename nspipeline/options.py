@@ -78,7 +78,7 @@ class Options(object):
         state = self.__dict__.copy()
 
         try:
-            pickle.dumps(self)
+            pickle.dumps(state)
         except:
             print("Error pickling options -- couldn't serialize all objects! please ")
             print("try overriding __getstate__()")

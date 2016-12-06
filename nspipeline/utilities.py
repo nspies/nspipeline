@@ -1,6 +1,6 @@
 import collections
 import errno
-import h5py
+#import h5py
 import os
 import numpy
 import pandas as pandas
@@ -59,75 +59,75 @@ def revcomp(seq):
     return seq[::-1].translate(comp)
 
     
-###############################################################################
-###############################################################################
+# ###############################################################################
+# ###############################################################################
 
-# based on hdf5.py from 10X Genomics
+# # based on hdf5.py from 10X Genomics
 
-LEVEL_GROUP = "_levels"
+# LEVEL_GROUP = "_levels"
 
-def has_levels(ds):
-    """ Determine if a data column is leveled """
-    if "levels" in ds.attrs.keys():
-        return True
+# def has_levels(ds):
+#     """ Determine if a data column is leveled """
+#     if "levels" in ds.attrs.keys():
+#         return True
 
-    level_grp = ds.file.get(LEVEL_GROUP)
-    if level_grp:
-        ds_name = ds.name.split("/")[-1]
-        level_ds = level_grp.get(ds_name)
-        if level_ds:
-            return True
+#     level_grp = ds.file.get(LEVEL_GROUP)
+#     if level_grp:
+#         ds_name = ds.name.split("/")[-1]
+#         level_ds = level_grp.get(ds_name)
+#         if level_ds:
+#             return True
 
-    return False
+#     return False
 
-def get_levels(ds):
-    """ Get the level index for a dataset """
-    if "levels" in ds.attrs.keys():
-        return ds.attrs["levels"][:]
+# def get_levels(ds):
+#     """ Get the level index for a dataset """
+#     if "levels" in ds.attrs.keys():
+#         return ds.attrs["levels"][:]
 
-    level_grp = ds.file.get(LEVEL_GROUP)
-    if level_grp:
-        ds_name = ds.name.split("/")[-1]
-        level_ds = level_grp.get(ds_name)
-        if level_ds:
-            return level_ds[:]
+#     level_grp = ds.file.get(LEVEL_GROUP)
+#     if level_grp:
+#         ds_name = ds.name.split("/")[-1]
+#         level_ds = level_grp.get(ds_name)
+#         if level_ds:
+#             return level_ds[:]
 
-    return None
+#     return None
 
-def get_column_intersection(column_names, columns):
-    if len(columns) > 0:
-        column_names = sorted(list(set(columns) & set(column_names)))
-        if len(column_names) == 0:
-            raise Exception("No valid column specifications.")
-    return column_names
+# def get_column_intersection(column_names, columns):
+#     if len(columns) > 0:
+#         column_names = sorted(list(set(columns) & set(column_names)))
+#         if len(column_names) == 0:
+#             raise Exception("No valid column specifications.")
+#     return column_names
 
-def read_data_frame(fn, query_cols=[]):
-    """ Load a pandas DataFrame from an HDF5 file. If a column list is 
-    specified, only load the matching columns """
+# def read_data_frame(fn, query_cols=[]):
+#     """ Load a pandas DataFrame from an HDF5 file. If a column list is 
+#     specified, only load the matching columns """
 
-    with h5py.File(fn, "r") as f:
-        column_names = f.attrs.get("column_names")
-        column_names = get_column_intersection(column_names, query_cols)
+#     with h5py.File(fn, "r") as f:
+#         column_names = f.attrs.get("column_names")
+#         column_names = get_column_intersection(column_names, query_cols)
 
-        df = pandas.DataFrame()
+#         df = pandas.DataFrame()
 
-        # Add the columns progressively to save memory
-        for name in column_names:
-            ds = f[name]
-            if has_levels(ds):
-                indices = ds[:]
-                uniques = get_levels(ds)
-                # This method of constructing of Categorical avoids copying the 
-                # indices array which saves memory for big datasets
-                df[name] = pandas.Categorical(indices, categories=uniques, 
-                                              ordered=False, fastpath=True)
-            else:
-                df[name] = pandas.Series(ds[:])
+#         # Add the columns progressively to save memory
+#         for name in column_names:
+#             ds = f[name]
+#             if has_levels(ds):
+#                 indices = ds[:]
+#                 uniques = get_levels(ds)
+#                 # This method of constructing of Categorical avoids copying the 
+#                 # indices array which saves memory for big datasets
+#                 df[name] = pandas.Categorical(indices, categories=uniques, 
+#                                               ordered=False, fastpath=True)
+#             else:
+#                 df[name] = pandas.Series(ds[:])
 
-        return df
+#         return df
 
-###############################################################################
-###############################################################################
+# ###############################################################################
+# ###############################################################################
 
 
 def get_good_barcodes(fragments, proportion=0.90):

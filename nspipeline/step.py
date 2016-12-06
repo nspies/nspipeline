@@ -4,7 +4,7 @@ import os
 import shutil
 import time
 
-from grocsvs import log
+from nspipeline import log
 
 
 class StepChunk(object):

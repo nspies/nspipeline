@@ -1,5 +1,4 @@
 import collections
-import os
 
 from nspipeline import options
 from nspipeline import step
