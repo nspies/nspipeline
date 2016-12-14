@@ -1,6 +1,7 @@
 import os
 import cPickle as pickle
 
+from nspipeline import reference
 from nspipeline import utilities
 
 
@@ -44,9 +45,9 @@ class Options(object):
         self.cluster_settings = ClusterSettings()
         self.debug = debug
 
-    @staticmethod
-    def deserialize(options_dict, options_path):
-        options = Options(options_path)
+    @classmethod
+    def deserialize(cls, options_dict, options_path):
+        options = cls(options_path)
 
         options.cluster_settings = ClusterSettings.deserialize(
             options_dict.pop("cluster_settings", {}))
@@ -87,3 +88,24 @@ class Options(object):
         return state
 
 
+
+
+class OptionsWithReference(Options):
+    def __init__(self, options_path, debug=False):
+        super(OptionsWithReference, self).__init__(options_path, debug)
+        self._reference = None
+
+    @property
+    def reference(self):
+        if self._reference is None:
+            self._reference = reference.Reference(self.ref_fasta, self.debug)
+        return self._reference
+
+    def __getstate__(self):
+        """
+        allows pickling of Options instances, necessary for ipyparallel
+        """
+        state = self.__dict__.copy()
+        state["_reference"] = None
+
+        return state

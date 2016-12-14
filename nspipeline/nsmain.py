@@ -94,4 +94,5 @@ def parse_arguments(args, options_class, stages):
 def main(options_class, stages):
     options = parse_arguments(sys.argv, options_class, stages)
     run(options, stages)
+    return options
 
