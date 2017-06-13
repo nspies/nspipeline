@@ -66,7 +66,7 @@ def load_config(config_path, options_class):
 
     
 def parse_arguments(args, options_class, stages):
-    parser = argparse.ArgumentParser(description="tenxtyper")
+    parser = argparse.ArgumentParser(description="nspipeline")
     parser.add_argument("config", help="Path to configuration.json file")
     parser.add_argument("--restart", metavar="FROM-STAGE", help="restart from this stage")
     parser.add_argument("--local", action="store_true", help="run locally using multiprocessing")
