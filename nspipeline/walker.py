@@ -73,6 +73,17 @@ class Walker(step.StepChunk):
             results_in_order = [chrom_results[i] for i in intervals]
             cls.summarize_chrom(chrom, intervals, results_in_order)
 
+
+def run(walker):
+    stages = collections.OrderedDict()
+    stages["first"] = walker
+
+    opts = nsmain.main(options.OptionsWithReference, stages)
+
+    walker.combine(opts)
+
+
+
 class TestWalker(Walker):
     big_step = 1e8
     small_step = 1e7
@@ -84,14 +95,6 @@ class TestWalker(Walker):
     @staticmethod
     def summarize_chrom(chrom, intervals, chrom_results):
         print chrom, intervals
-
-def run(walker):
-    stages = collections.OrderedDict()
-    stages["first"] = walker
-
-    opts = nsmain.main(options.OptionsWithReference, stages)
-
-    walker.combine(opts)
-
+        
 if __name__ == '__main__':
     run(TestWalker)
