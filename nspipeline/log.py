@@ -43,7 +43,12 @@ class Logger(object):
         self.log("ERROR: {}".format(error_message))
 
 
-
+def run_git_command(cmd):
+    args = {}
+    if sys.version_info > (3,0):
+        args = {"encoding":"utf-8"}
+    devnull = open(os.devnull, "w")
+    return subprocess.check_output(cmd, shell=True, stderr=devnull, **args).strip()
 
 def log_command(options, argv):
     main_dir = os.path.dirname(argv[0])
@@ -52,9 +57,8 @@ def log_command(options, argv):
 
     try:
         with utilities.cd(main_dir):
-            with open(os.devnull, "w") as devnull:
-                git_hash = subprocess.check_output("git rev-parse HEAD", shell=True, stderr=devnull).strip()
-                if subprocess.check_output("git diff", shell=True, stderr=devnull):
+                git_hash = run_git_command("git rev-parse HEAD")#, shell=True, stderr=devnull).strip()
+                if run_git_command("git diff"):#, shell=True, stderr=devnull):
                     git_hash += "+"
     except subprocess.CalledProcessError:
         git_hash = ""

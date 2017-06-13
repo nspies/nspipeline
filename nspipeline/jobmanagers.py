@@ -29,7 +29,7 @@ class IPCluster(Cluster):
 
         cluster_args.update(self.cluster_settings.cluster_options)
         
-        print cluster_args
+        print(cluster_args)
 
         with cluster_view(**cluster_args) as view:
             async_results = view.map(fn, args, block=False)

@@ -70,15 +70,15 @@ class Runner(object):
 def _run_chunk(chunk):
     try:
         chunk.start_logging()
-    except Exception, e:
-        print "== Error starting logging =="
+    except Exception as e:
+        print("== Error starting logging ==")
         raise
 
     try:
         chunk.run()
         chunk.finalize()
         chunk.stop_logging()
-    except Exception, e:
+    except Exception as e:
         chunk.logger.exception(e)
         raise
         

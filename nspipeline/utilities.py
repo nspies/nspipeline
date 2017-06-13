@@ -42,19 +42,30 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
             for text in re.split(_nsre, s)]    
 
 
-def get_key(options_dict, key, type_=basestring, default="error", error_msg="configuration"):
+def get_key(options_dict, key, type_=None, default="error", error_msg="configuration"):
     if default == "error" and key not in options_dict:
-        print "CONFIG ERROR: {} key '{}' is missing".format(error_msg, key)
+        print("CONFIG ERROR: {} key '{}' is missing".format(error_msg, key))
         sys.exit(1)
     value = options_dict.get(key, default)
+
+    if type_ is None:
+        try:
+            type_ = basestring
+        except NameError:
+            type_ = str
+
     if type_ is not None and not isinstance(value, type_):
-        print "CONFIG ERROR: {} key '{}' should be type '{}', not '{}'".format(
-            error_msg, key, type_.__name__, type(value).__name__)
+        print("CONFIG ERROR: {} key '{}' should be type '{}', not '{}'".format(
+            error_msg, key, type_.__name__, type(value).__name__))
         sys.exit(1)
     return value
 
 
-comp = string.maketrans('ATCGatcg','TAGCtagc')
+try:
+    comp = str.maketrans('ATCGNatcgn','TAGCNtagcn')
+except AttributeError:
+    comp = string.maketrans('ATCGNatcgn','TAGCNtagcn')
+    
 def revcomp(seq):
     return seq[::-1].translate(comp)
 

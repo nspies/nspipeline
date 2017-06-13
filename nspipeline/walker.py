@@ -1,9 +1,6 @@
 import collections
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+from nspipeline.utilities import pickle
 
 from nspipeline import options
 from nspipeline import step
@@ -51,7 +48,7 @@ class Walker(step.StepChunk):
             interval = (self.chrom, cur_start, cur_end)
             results[interval] = cur_result
 
-        with open(outpath, "w") as outfile:
+        with open(outpath, "wb") as outfile:
             pickle.dump(results, outfile, protocol=-1)
 
     @classmethod
@@ -65,7 +62,7 @@ class Walker(step.StepChunk):
             chrom_results = {}
             for cur_step in steps_by_chrom[chrom]:
                 inpath = cur_step.outpaths(final=True)["results"]
-                with open(inpath) as infile:
+                with open(inpath, "rb") as infile:
                     chunk_results = pickle.load(infile)
                     chrom_results.update(chunk_results)
 
@@ -94,7 +91,7 @@ class TestWalker(Walker):
 
     @staticmethod
     def summarize_chrom(chrom, intervals, chrom_results):
-        print chrom, intervals
+        print(chrom, intervals)
         
 if __name__ == '__main__':
     run(TestWalker)

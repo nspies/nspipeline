@@ -1,5 +1,5 @@
 import os
-import cPickle as pickle
+from nspipeline.utilities import pickle
 
 from nspipeline import reference
 from nspipeline import utilities
