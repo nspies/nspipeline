@@ -2,7 +2,7 @@ import errno
 import logging
 import os
 
-import jobmanagers
+from nspipeline import jobmanagers
 
 def ensure_dir(directory):
     try:

@@ -109,3 +109,20 @@ class OptionsWithReference(Options):
         state["_reference"] = None
 
         return state
+
+
+def make_options(output_dir, ref_fasta=None, cluster_settings=None):
+    if not output_dir.endswith("/"):
+        output_dir += "/"
+
+    options_dict = {}
+    if cluster_settings is not None:
+        options_dict["cluster_settings"] = cluster_settings
+
+    if ref_fasta is not None:
+        options_dict["ref_fasta"] = ref_fasta
+        options = OptionsWithReference.deserialize(options_dict, output_dir)
+    else:
+        options = Options.deserialize(options_dict, output_dir)
+
+    return options
