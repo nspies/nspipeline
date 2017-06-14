@@ -38,7 +38,7 @@ class Walker(step.StepChunk):
     def run(self):
         outpath = self.outpaths(final=False)["results"]
 
-        results = {}
+        results = collections.OrderedDict()
         for cur_start in range(self.start, self.end, self.step):
             cur_end = min(cur_start + self.step, self.end)
             cur_result = self.apply(self.chrom,
@@ -52,23 +52,24 @@ class Walker(step.StepChunk):
             pickle.dump(results, outfile, protocol=-1)
 
     @classmethod
-    def combine(cls, options):
+    def results_for_chrom(cls, options, chrom):
         steps = cls.get_steps(options)
         steps_by_chrom = collections.defaultdict(list)
         for cur_step in steps:
             steps_by_chrom[cur_step.chrom].append(cur_step)
 
-        for chrom in sorted(steps_by_chrom):
-            chrom_results = {}
-            for cur_step in steps_by_chrom[chrom]:
-                inpath = cur_step.outpaths(final=True)["results"]
-                with open(inpath, "rb") as infile:
-                    chunk_results = pickle.load(infile)
-                    chrom_results.update(chunk_results)
+        chrom_steps = steps_by_chrom[chrom]
+        chrom_steps.sort(key=lambda x: (x.chrom, x.start, x.end))
 
-            intervals = sorted(chrom_results)
-            results_in_order = [chrom_results[i] for i in intervals]
-            cls.summarize_chrom(chrom, intervals, results_in_order)
+        chrom_results = {}
+        for cur_step in chrom_steps:
+            inpath = cur_step.outpaths(final=True)["results"]
+            with open(inpath, "rb") as infile:
+                chunk_results = pickle.load(infile)
+                chrom_results.update(chunk_results)
+
+                for chunk, result in chrom_results.items():
+                    yield chunk, result
 
 
 def run(walker):
