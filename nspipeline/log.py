@@ -15,13 +15,20 @@ class Logger(object):
     def __init__(self, log_path):
         self.log_path = log_path
         self.log_file = None
-        self.open_log()
+        # self.open_log()
 
     def open_log(self):
-        if self.log_file is None:
+        if self.log_file is None or self.log_file.closed:
             self.log_file = open(self.log_path, "a")
 
+    def close_log(self):
+        if self.log_file is not None and not self.log_file.closed:
+            self.log_file.close()
+            self.log_file = None
+
     def log(self, message):
+        self.open_log()
+
         date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         message_str = "{} - {}\n".format(date_str, message)
 
@@ -31,6 +38,8 @@ class Logger(object):
         sys.stderr.write(message_str)
         sys.stderr.flush()
 
+        self.close_log()
+        
     def exception(self, exception):
         trace_string = traceback.format_exc()
         self.log("="*10 + " Exception " + "="*10)

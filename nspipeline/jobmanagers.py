@@ -9,7 +9,9 @@ class Cluster(object):
 
 class LocalCluster(Cluster):
     def map(self, fn, args):
-        for arg in args:
+        # for arg in args:
+        while len(args) > 0:
+            arg = args.pop(0)
             fn(arg)
 
 

@@ -26,6 +26,11 @@ class Walker(step.StepChunk):
         self.end = end
         self.step = step
 
+        self._prepared = False
+
+    def prepare_walker(self):
+        pass
+
     def __str__(self):
         return ".".join([self.__class__.__name__,
                          self.chrom,
@@ -36,6 +41,10 @@ class Walker(step.StepChunk):
         return {"results": "results.{}.pickle".format(str(self))}
 
     def run(self):
+        if not self._prepared:
+            self.prepare_walker()
+            self._prepared = True
+
         outpath = self.outpaths(final=False)["results"]
 
         results = collections.OrderedDict()
