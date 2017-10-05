@@ -25,10 +25,8 @@ def make_jobmanager(jobmanager_settings, processes, batch_dir):
 class Runner(object):
     def __init__(self, options):
         self.options = options
-        self.jobmanagers = None
 
-
-    def run_stage(self, stage, stage_name):
+    def run_stage(self, stage, stage_name, jobmanager=None):
         to_run = []
         all_steps = stage.get_steps(self.options)
         for step_chunk in all_steps:
@@ -47,11 +45,19 @@ class Runner(object):
             ensure_dir(to_run[0].working_dir)
             ensure_dir(os.path.join(self.options.log_dir, to_run[0].__class__.__name__))
 
-            processes = min(self.options.cluster_settings.processes, len(to_run))
-            jobmanagers = make_jobmanager(
-                self.options.cluster_settings, processes, self.options.working_dir)
-            jobmanagers.map(_run_chunk, to_run)
 
+            own_jobmanager = jobmanager is None
+            if own_jobmanager:
+                processes = min(self.options.cluster_settings.processes, len(to_run))                
+                jobmanager = make_jobmanager(
+                    self.options.cluster_settings, processes, self.options.working_dir)
+                jobmanager.start()
+                
+            jobmanager.map(_run_chunk, to_run)
+
+            if own_jobmanager:
+                jobmanager.stop()
+                
             error_not_done = []
             for step_chunk in all_steps:
                 if step_chunk.needs_to_run():

@@ -1,6 +1,11 @@
 import multiprocessing
 
 class Cluster(object):
+    def start(self):
+        pass
+    def stop(self):
+        pass
+
     def __init__(self, processes, cluster_settings, batch_dir):
         self.processes = processes
         self.cluster_settings = cluster_settings
@@ -16,11 +21,16 @@ class LocalCluster(Cluster):
 
 
 class IPCluster(Cluster):
-    # def __init__(self, processes, cluster_settings, batch_dir):
-    #     super(IPCluster, self).__init__(processes, cluster_settings)
+    def __init__(self, processes, cluster_settings, batch_dir):
+        super(IPCluster, self).__init__(processes, cluster_settings, batch_dir)
+        self.view = None
 
-    def map(self, fn, args):
-        from cluster_helper.cluster import cluster_view
+    def start(self):
+        if self.view is not None:
+            print("using existing cluster view")
+            return
+        
+        from cluster_helper.cluster import ClusterView
 
         cluster_args = {
             "scheduler": None,
@@ -30,13 +40,22 @@ class IPCluster(Cluster):
         }
 
         cluster_args.update(self.cluster_settings.cluster_options)
-        
+        if not "local_controller" in cluster_args["extra_params"]:
+            cluster_args["extra_params"]["local_controller"]
+            
         print(cluster_args)
 
-        with cluster_view(**cluster_args) as view:
-            async_results = view.map(fn, args, block=False)
-            async_results.wait_interactive()
-            return async_results.get()
+        self.view = ClusterView(**cluster_args)
+
+    def stop(self):
+        if self.view:
+            self.view.stop()
+            self.view = None
+        
+    def map(self, fn, args):
+        async_results = self.view.view.map(fn, args, block=False)
+        async_results.wait_interactive()
+        return async_results.get()
 
 class MultiprocessingCluster(Cluster):
     def map(self, fn, args):

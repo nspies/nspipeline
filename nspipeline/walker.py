@@ -30,7 +30,9 @@ class Walker(step.StepChunk):
 
     def prepare_walker(self):
         pass
-
+    def finish_walker(self):
+        pass
+        
     def __str__(self):
         return ".".join([self.__class__.__name__,
                          self.chrom,
@@ -44,11 +46,18 @@ class Walker(step.StepChunk):
         if not self._prepared:
             self.prepare_walker()
             self._prepared = True
-
+        else:
+            self.logger.log("Didn't really expect to get here klmnop")
+            
         outpath = self.outpaths(final=False)["results"]
 
         results = collections.OrderedDict()
-        for cur_start in range(self.start, self.end, self.step):
+        # import tqdm
+        # for cur_start in tqdm.tqdm(range(self.start, self.end, self.step)):
+        start_iter = range(self.start, self.end, self.step)
+        for i, cur_start in enumerate(start_iter):
+            if i > 5 and ((i % int(len(start_iter)/5)) == 0):
+                self.logger.log("{}/{}".format(i, len(start_iter)))
             cur_end = min(cur_start + self.step, self.end)
             cur_result = self.apply(self.chrom,
                                     cur_start,
@@ -60,6 +69,9 @@ class Walker(step.StepChunk):
         with open(outpath, "wb") as outfile:
             pickle.dump(results, outfile, protocol=-1)
 
+        self.finish_walker()
+
+        
     @classmethod
     def results_for_chrom(cls, options, chrom):
         steps = cls.get_steps(options)
@@ -70,14 +82,12 @@ class Walker(step.StepChunk):
         chrom_steps = steps_by_chrom[chrom]
         chrom_steps.sort(key=lambda x: (x.chrom, x.start, x.end))
 
-        chrom_results = {}
         for cur_step in chrom_steps:
             inpath = cur_step.outpaths(final=True)["results"]
             with open(inpath, "rb") as infile:
                 chunk_results = pickle.load(infile)
-                chrom_results.update(chunk_results)
 
-                for chunk, result in chrom_results.items():
+                for chunk, result in chunk_results.items():
                     yield chunk, result
 
 

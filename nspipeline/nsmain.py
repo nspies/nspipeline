@@ -20,7 +20,7 @@ def ready_output_dir(options):
     utilities.ensure_dir(options.log_dir)
 
 
-def run(options, stages):
+def run(options, stages, jobmanager=None):
     """
     1. create output directories
     2. collect args for each stage
@@ -34,7 +34,7 @@ def run(options, stages):
     runner = pipeline.Runner(options)
 
     for stage_name, stage in stages.items():
-        runner.run_stage(stage, stage_name)
+        runner.run_stage(stage, stage_name, jobmanager)
 
 
 def clean(options, stages, clean_stage_name):
@@ -91,8 +91,8 @@ def parse_arguments(args, options_class, stages):
     return options
 
 
-def main(options_class, stages):
+def main(options_class, stages, jobmanager=None):
     options = parse_arguments(sys.argv, options_class, stages)
-    run(options, stages)
+    run(options, stages, jobmanager)
     return options
 

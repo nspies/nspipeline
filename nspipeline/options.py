@@ -3,7 +3,7 @@ from nspipeline.utilities import pickle
 
 from nspipeline import reference
 from nspipeline import utilities
-
+from nspipeline import jobmanagers
 
 class ClusterSettings(object):
     def __init__(self):
@@ -31,6 +31,7 @@ class ClusterSettings(object):
             "cluster_options": self.cluster_options
         }
 
+        
     
 class Options(object):
     """
@@ -86,6 +87,24 @@ class Options(object):
             raise
             
         return state
+
+
+    def get_jobmanager(self, processes=None):
+        #def make_jobmanager(jobmanager_settings, processes, batch_dir):
+
+        if processes is None:
+            processes = self.cluster_settings.processes
+
+        jobmanager_settings = self.cluster_settings
+        batch_dir = self.working_dir
+            
+        jobmanager_classes = {"IPCluster":jobmanagers.IPCluster,
+                              "local":    jobmanagers.LocalCluster,
+                              "multiprocessing": jobmanagers.MultiprocessingCluster,
+                              "admiral": jobmanagers.AdmiralCluster}
+        
+        cls = jobmanager_classes[jobmanager_settings.cluster_type]
+        return cls(processes, jobmanager_settings, batch_dir)
 
 
 
