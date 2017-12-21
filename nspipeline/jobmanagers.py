@@ -41,7 +41,7 @@ class IPCluster(Cluster):
 
         cluster_args.update(self.cluster_settings.cluster_options)
         if not "local_controller" in cluster_args["extra_params"]:
-            cluster_args["extra_params"]["local_controller"]
+            cluster_args["extra_params"]["local_controller"] = True
             
         print(cluster_args)
 
@@ -68,7 +68,7 @@ class AdmiralCluster(Cluster):
         from admiral import jobmanagers, remote
 
         cluster_options = self.cluster_settings.cluster_options.copy()
-        
+
         scheduler = cluster_options.pop("scheduler")
 
         jobmanager_class = jobmanagers.get_jobmanager(scheduler)
@@ -87,7 +87,7 @@ class AdmiralCluster(Cluster):
         job_name = args[0].__class__.__name__
         args = [[arg] for arg in args]
         job = remote.run_remote(fn, jobmanager, job_name, args=args,
-                                array=True, overwrite=True, **cluster_options)
+                                overwrite=True, **cluster_options)
 
         result = jobmanagers.wait_for_jobs([job], wait=5, progress=True)
 

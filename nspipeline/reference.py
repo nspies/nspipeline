@@ -44,10 +44,10 @@ def split_genome(chroms, chroms_to_lengths, chunk_size, evenly=False):
             yield (chrom, 0, cur_length)
         else:
             if evenly:
-                cur_chunk_size = int(chunk_size)
-            else:
                 cur_chunk_size = int(cur_length/numpy.ceil(cur_length/float(chunk_size))) + 1
-
+            else:
+                cur_chunk_size = int(chunk_size)
+                
             for i in range(0, chroms_to_lengths[chrom], cur_chunk_size):
                 yield (chrom, i, min(chroms_to_lengths[chrom], i+cur_chunk_size))
 
